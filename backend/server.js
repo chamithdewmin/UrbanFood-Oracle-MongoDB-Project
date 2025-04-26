@@ -1,41 +1,49 @@
-require("dotenv").config();  // Load environment variables from .env file
-
 const express = require("express");
-const mongoose = require("mongoose");
 const cors = require("cors");
-const bodyParser = require("body-parser");
-const Feedback = require("./models/Feedback");
+const { getConnection } = require("./db/dbconfig"); // ⭐ Import from db folder
 
 const app = express();
-
-// Middleware
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 
-// MongoDB connection using the MONGO_URI environment variable
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("Connected to MongoDB");
-  })
-  .catch((error) => {
-    console.error("Error connecting to MongoDB:", error);
-  });
-
-// POST route for feedback submission
-app.post("/api/feedback", async (req, res) => {
-  const { name, message } = req.body;
+// API: Get all products
+app.get("/api/products", async (req, res) => {
+  let connection;
 
   try {
-    const feedback = new Feedback({ name, message });
-    await feedback.save();
-    res.status(200).send("Feedback submitted successfully");
+    // ⭐ Use imported getConnection function
+    connection = await getConnection();
+
+    const result = await connection.execute(
+      `SELECT product_id, name, description, price, image_url, category FROM products`
+    );
+
+    const products = result.rows.map((row) => ({
+      id: row[0],
+      name: row[1],
+      description: row[2],
+      price: row[3],
+      image: row[4],
+      category: row[5],
+    }));
+
+    res.json(products);
   } catch (error) {
-    res.status(500).send("Error: Unable to submit feedback");
+    console.error("Error fetching products:", error);
+    res.status(500).json({ error: "Failed to fetch products" });
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
   }
 });
 
-// Start the server using the PORT environment variable
-const PORT = process.env.PORT || 5000;
+// Start the server
+const PORT = 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`✅ Server running at http://localhost:${PORT}`);
 });

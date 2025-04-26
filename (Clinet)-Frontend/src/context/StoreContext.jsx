@@ -1,10 +1,25 @@
 import { createContext, useEffect, useState } from "react";
-import { food_list } from "../assets/assets";
+import axios from "axios"; // ⭐ import axios for fetching backend data
 
 export const StoreContext = createContext(null);
 
 const StoreContextProvider = (props) => {
+  const [food_list, setFoodList] = useState([]); // 🔥 dynamic food_list now
   const [cartItems, setCartItems] = useState({});
+
+  // ⭐ Fetch products from backend API
+  useEffect(() => {
+    const fetchFoodList = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/products"); // Change to your server URL
+        setFoodList(response.data);
+      } catch (error) {
+        console.error("Error fetching food list:", error);
+      }
+    };
+
+    fetchFoodList();
+  }, []);
 
   const addToCart = (itemId) => {
     if (!cartItems[itemId]) {
@@ -16,7 +31,6 @@ const StoreContextProvider = (props) => {
 
   const removeFromCart = (itemId) => {
     if (cartItems[itemId] === 1) {
-      // Remove the item if the quantity becomes zero
       const newCartItems = { ...cartItems };
       delete newCartItems[itemId];
       setCartItems(newCartItems);
@@ -37,8 +51,10 @@ const StoreContextProvider = (props) => {
     let totalAmount = 0;
     for (const item in cartItems) {
       if (cartItems[item] > 0) {
-        let itemInfo = food_list.find((product) => product._id === item);
-        totalAmount += itemInfo.price * cartItems[item];
+        let itemInfo = food_list.find((product) => product.id === item); // 🔥 'id', not '_id'
+        if (itemInfo) {
+          totalAmount += itemInfo.price * cartItems[item];
+        }
       }
     }
     return totalAmount;
