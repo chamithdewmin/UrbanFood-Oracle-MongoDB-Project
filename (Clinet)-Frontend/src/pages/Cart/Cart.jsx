@@ -14,6 +14,7 @@ const Cart = () => {
     getTotalCartAmount,
     getTotalQuantity,
   } = useContext(StoreContext);
+
   const totalQuantity = getTotalQuantity();
   const navigate = useNavigate();
 
@@ -34,47 +35,44 @@ const Cart = () => {
           <p className="NoItems">No Items in cart</p>
         ) : (
           food_list.map((item, index) => {
-            if (cartItems[item._id] > 0) {
+            if (cartItems[item.ID] > 0) {
               return (
-                <React.Fragment key={item._id}>
-                  <div
-                    className="cart-items-title cart-items-item"
-                    key={item._id}
-                  >
-                    <img src={item.image} alt="food img" />
-                    <p>{item.name}</p>
-                    <p>${item.price}</p>
-                    <p>{cartItems[item._id]}</p>
-                    <p>${item.price * cartItems[item._id]}</p>
+                <React.Fragment key={item.ID}>
+                  <div className="cart-items-title cart-items-item">
+                    <img src={item.IMAGE} alt="food" />
+                    <p>{item.NAME}</p>
+                    <p>${item.PRICE.toFixed(2)}</p>
+                    <p>{cartItems[item.ID]}</p>
+                    <p>${(item.PRICE * cartItems[item.ID]).toFixed(2)}</p>
                     <p
                       className="Remove"
-                      onClick={() => removeFromCart(item._id)}
+                      onClick={() => removeFromCart(item.ID)}
                     >
-                      <img
-                        src={assets.remove_icon_cross}
-                        alt="remove_icon_cross"
-                      />
+                      <img src={assets.remove_icon_cross} alt="remove" />
                     </p>
                   </div>
-                  <hr key={`hr-${item._id}-${index}`} />
+                  <hr key={`hr-${item.ID}-${index}`} />
                 </React.Fragment>
               );
             }
+            return null;
           })
         )}
       </div>
+
+      {/* BOTTOM PART */}
       <div className="cart-bottom">
         <div className="cart-total">
           <h2>Cart Total</h2>
           <div>
             <div className="cart-total-details">
               <p>Subtotal</p>
-              <p>${getTotalCartAmount()}</p>
+              <p>${getTotalCartAmount().toFixed(2)}</p>
             </div>
             <hr />
             <div className="cart-total-details">
-              <p>Delivery Free</p>
-              <p>${getTotalCartAmount() === 0 ? 0 : deliveryFee}</p>
+              <p>Delivery Fee</p>
+              <p>${getTotalCartAmount() === 0 ? 0 : deliveryFee.toFixed(2)}</p>
             </div>
             <hr />
             <div className="cart-total-details">
@@ -83,7 +81,7 @@ const Cart = () => {
                 $
                 {getTotalCartAmount() === 0
                   ? 0
-                  : getTotalCartAmount() + deliveryFee}
+                  : (getTotalCartAmount() + deliveryFee).toFixed(2)}
               </b>
             </div>
           </div>
@@ -94,9 +92,11 @@ const Cart = () => {
             PROCEED TO CHECKOUT
           </button>
         </div>
+
+        {/* PROMO CODE AREA */}
         <div className="cart-promocode">
           <div>
-            <p>If you have a promocode, Enter it here</p>
+            <p>If you have a promo code, enter it here</p>
             <div className="cart-promocode-input">
               <input type="text" placeholder="Promo Code" />
               <button>Submit</button>

@@ -1,63 +1,61 @@
 import { createContext, useEffect, useState } from "react";
-import axios from "axios"; // ⭐ import axios for fetching backend data
+import axios from "axios";
 
 export const StoreContext = createContext(null);
 
 const StoreContextProvider = (props) => {
-  const [food_list, setFoodList] = useState([]); // 🔥 dynamic food_list now
+  const [food_list, setFoodList] = useState([]);
   const [cartItems, setCartItems] = useState({});
 
-  // ⭐ Fetch products from backend API
+  // Fetch product list from backend
   useEffect(() => {
     const fetchFoodList = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/products"); // Change to your server URL
+        const response = await axios.get("http://localhost:3000/api/products"); // update if different URL
         setFoodList(response.data);
       } catch (error) {
         console.error("Error fetching food list:", error);
       }
     };
-
     fetchFoodList();
   }, []);
 
+  // Add to cart
   const addToCart = (itemId) => {
-    if (!cartItems[itemId]) {
-      setCartItems((prev) => ({ ...prev, [itemId]: 1 }));
-    } else {
-      setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
-    }
+    setCartItems((prev) => ({
+      ...prev,
+      [itemId]: (prev[itemId] || 0) + 1,
+    }));
   };
 
-  const removeFromCart = (itemId) => {
-    if (cartItems[itemId] === 1) {
-      const newCartItems = { ...cartItems };
-      delete newCartItems[itemId];
-      setCartItems(newCartItems);
-    } else {
-      setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
-    }
+  // Remove from cart
+  const removeFromCart = (itemId, removeAll = false) => {
+    setCartItems((prev) => {
+      const updated = { ...prev };
+      if (removeAll || updated[itemId] <= 1) {
+        delete updated[itemId];
+      } else {
+        updated[itemId] -= 1;
+      }
+      return updated;
+    });
   };
 
-  const getTotalQuantity = () => {
-    let totalQuantity = 0;
-    for (const itemId in cartItems) {
-      totalQuantity += cartItems[itemId];
-    }
-    return totalQuantity;
-  };
-
+  // Get total cart amount
   const getTotalCartAmount = () => {
-    let totalAmount = 0;
-    for (const item in cartItems) {
-      if (cartItems[item] > 0) {
-        let itemInfo = food_list.find((product) => product.id === item); // 🔥 'id', not '_id'
-        if (itemInfo) {
-          totalAmount += itemInfo.price * cartItems[item];
-        }
+    let total = 0;
+    for (const id in cartItems) {
+      const product = food_list.find((item) => item.ID === parseInt(id));
+      if (product) {
+        total += product.PRICE * cartItems[id];
       }
     }
-    return totalAmount;
+    return total;
+  };
+
+  // Get total quantity
+  const getTotalQuantity = () => {
+    return Object.values(cartItems).reduce((acc, val) => acc + val, 0);
   };
 
   const contextValue = {
