@@ -11,7 +11,7 @@ const StoreContextProvider = (props) => {
   useEffect(() => {
     const fetchFoodList = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/products"); // Change to your server URL
+        const response = await axios.get("http://localhost:3000/api/products"); // Change to your server URL
         setFoodList(response.data);
       } catch (error) {
         console.error("Error fetching food list:", error);

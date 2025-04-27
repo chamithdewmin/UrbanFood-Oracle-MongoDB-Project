@@ -1,22 +1,20 @@
-const express = require('express');
-const multer = require('multer');
 const { initializeDB } = require('../db/dbConnection');
+const oracledb = require('oracledb');
 
-// Set up multer to handle image uploads (store images in memory as a buffer)
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
-
-// Function to get all products (GET)
+// Function to get all products
 async function getProducts(req, res) {
   try {
     const connection = await initializeDB();
-    const result = await connection.execute('SELECT * FROM products');
-    
-    // Convert image BLOB to base64 for easier handling in frontend (optional)
+    const result = await connection.execute(
+      'SELECT * FROM products',
+      [],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT } // ⭐ important
+    );
+
     const products = result.rows.map(product => {
-      if (product.image) {
-        const imageBase64 = product.image.toString('base64');
-        product.image = `data:image/jpeg;base64,${imageBase64}`; // Assuming JPEG image
+      if (product.IMAGE) {
+        const imageBase64 = product.IMAGE.toString('base64');
+        product.IMAGE = `data:image/jpeg;base64,${imageBase64}`;
       }
       return product;
     });
@@ -28,28 +26,24 @@ async function getProducts(req, res) {
   }
 }
 
-// Function to create a new product (POST)
+// Function to create a new product
 async function createProduct(req, res) {
   const { name, category, price, supplier_id } = req.body;
-  const image = req.file;  // multer stores the image as buffer in memory
+  const image = req.file;
 
-  // Validate required fields
   if (!name || !price || !supplier_id || !image) {
     return res.status(400).json({ message: 'Name, price, supplier_id, and image are required' });
   }
 
   try {
     const connection = await initializeDB();
-
-    // Insert new product with image (as BLOB)
     const result = await connection.execute(
       `INSERT INTO products (name, category, price, supplier_id, image) 
       VALUES (:name, :category, :price, :supplier_id, :image)`,
-      [name, category, price, supplier_id, image.buffer], // image.buffer stores the binary data
+      [name, category, price, supplier_id, image.buffer],
       { autoCommit: true }
     );
 
-    // Check if the insert was successful
     if (result.rowsAffected === 0) {
       return res.status(500).json({ message: 'Error creating product' });
     }
@@ -61,42 +55,32 @@ async function createProduct(req, res) {
   }
 }
 
-// Function to update a product (PUT)
+// Function to update a product
 async function updateProduct(req, res) {
   const { id } = req.params;
   const { name, category, price, supplier_id } = req.body;
-  const image = req.file;  // multer stores the image as buffer in memory
+  const image = req.file;
 
-  // Validate required fields
   if (!name || !price || !supplier_id) {
     return res.status(400).json({ message: 'Name, price, and supplier_id are required' });
   }
 
   try {
     const connection = await initializeDB();
-
-    // Check if the product exists
-    const checkProduct = await connection.execute(
-      'SELECT * FROM products WHERE id = :id',
-      [id]
-    );
+    const checkProduct = await connection.execute('SELECT * FROM products WHERE id = :id', [id]);
 
     if (checkProduct.rows.length === 0) {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    // Update product in the database (with or without new image)
-    const query = image ? 
-      `UPDATE products SET name = :name, category = :category, price = :price, supplier_id = :supplier_id, image = :image WHERE id = :id` : 
-      `UPDATE products SET name = :name, category = :category, price = :price, supplier_id = :supplier_id WHERE id = :id`;
+    const query = image ?
+      `UPDATE products SET name = :name, category = :category, price = :price, supplier_id = :supplier_id, image = :image WHERE id = :id`
+      : `UPDATE products SET name = :name, category = :category, price = :price, supplier_id = :supplier_id WHERE id = :id`;
 
-    const params = image ? 
-      [name, category, price, supplier_id, image.buffer, id] :
-      [name, category, price, supplier_id, id];
+    const params = image ? [name, category, price, supplier_id, image.buffer, id] : [name, category, price, supplier_id, id];
 
     const result = await connection.execute(query, params, { autoCommit: true });
 
-    // Check if the update was successful
     if (result.rowsAffected === 0) {
       return res.status(500).json({ message: 'Error updating product' });
     }
@@ -108,31 +92,24 @@ async function updateProduct(req, res) {
   }
 }
 
-// Function to delete a product (DELETE)
+// Function to delete a product
 async function deleteProduct(req, res) {
   const { id } = req.params;
 
   try {
     const connection = await initializeDB();
-
-    // Check if the product exists
-    const checkProduct = await connection.execute(
-      'SELECT * FROM products WHERE id = :id',
-      [id]
-    );
+    const checkProduct = await connection.execute('SELECT * FROM products WHERE id = :id', [id]);
 
     if (checkProduct.rows.length === 0) {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    // Delete product from the database
     const result = await connection.execute(
       `DELETE FROM products WHERE id = :id`,
       [id],
       { autoCommit: true }
     );
 
-    // Check if the delete was successful
     if (result.rowsAffected === 0) {
       return res.status(500).json({ message: 'Error deleting product' });
     }
