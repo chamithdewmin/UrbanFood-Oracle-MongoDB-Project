@@ -1,62 +1,83 @@
 import React, { useContext, useState } from "react";
 import axios from "axios";
 import "./add.css";
-import { assets } from "../../assets/assets.js";
 import { AdminContext } from "../../context/AdminContext";
 
 const Add = () => {
+  const { token } = useContext(AdminContext);
+
   const [showAlert, setShowAlert] = useState(false);
   const [alertType, setAlertType] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
-  const [image, setImage] = useState(null);
+
+  const [isUpdateMode, setIsUpdateMode] = useState(false);
+  const [productId, setProductId] = useState("");
+
   const [data, setData] = useState({
     name: "",
     category: "",
     price: "",
-    supplier_id: "", // ⭐ must add this
+    supplier_id: "",
   });
-  const { token } = useContext(AdminContext);
 
-  const onChangeHandler = (event) => {
-    const name = event.target.name;
-    const value = event.target.value;
-    setData((prevData) => ({ ...prevData, [name]: value }));
+  const categories = [
+    "Salad", "Rolls", "Deserts", "Sandwich",
+    "Cake", "Pure Veg", "Pasta", "Noodles"
+  ];
+
+  const onChangeHandler = (e) => {
+    const { name, value } = e.target;
+    setData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const onSubmitHandler = async (event) => {
-    event.preventDefault();
-    const formData = new FormData();
-    formData.append("name", data.name);
-    formData.append("category", data.category);
-    formData.append("price", data.price);
-    formData.append("supplier_id", data.supplier_id);
-    formData.append("image", image); // ⭐ must match backend "image"
+  const resetForm = () => {
+    setData({
+      name: "",
+      category: "",
+      price: "",
+      supplier_id: "",
+    });
+    setProductId("");
+    setIsUpdateMode(false);
+  };
+
+  const showAlertMessage = (type, message) => {
+    setAlertType(type);
+    setAlertMessage(message);
+    setShowAlert(true);
+    setTimeout(() => setShowAlert(false), 3000);
+  };
+
+  const onSubmitHandler = async (e) => {
+    e.preventDefault();
 
     try {
-      await axios.post("http://localhost:3000/api/products", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`, // if you are using tokens
-        },
-      });
-      setAlertType("success");
-      setAlertMessage("Item added successfully!");
-      setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 3000);
+      if (isUpdateMode) {
+        if (!productId) {
+          showAlertMessage("error", "Please provide a Product ID to update.");
+          return;
+        }
+        await axios.put(`http://localhost:3000/api/products/${productId}`, data, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        showAlertMessage("success", "Product updated successfully!");
+      } else {
+        await axios.post("http://localhost:3000/api/products", data, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        showAlertMessage("success", "Product added successfully!");
+      }
 
-      setData({
-        name: "",
-        category: "",
-        price: "",
-        supplier_id: "",
-      });
-      setImage(null);
+      resetForm();
     } catch (error) {
-      setAlertType("error");
-      setAlertMessage("Failed to add product.");
-      setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 3000);
       console.error(error.response?.data || error.message);
+      showAlertMessage("error", error.response?.data?.message || "Failed to add/update product.");
     }
   };
 
@@ -65,69 +86,71 @@ const Add = () => {
       {showAlert && (
         <div className={`alert-box ${alertType} slide-in`}>
           <div className="alert-content">
-            <img
-              src={
-                alertType === "success"
-                  ? assets.success_icon
-                  : assets.error_icon
-              }
-              alt={alertType}
-            />
             <span>{alertMessage}</span>
           </div>
           <div className="progress-bar"></div>
         </div>
       )}
+
       <form className="flex-col" onSubmit={onSubmitHandler}>
-        <div className="add-img-upload flex-col">
-          <p>Upload Image</p>
-          <label htmlFor="image">
-            <img
-              src={image ? URL.createObjectURL(image) : assets.upload_area}
-              alt=""
-            />
-          </label>
+        <div className="checkbox-update">
           <input
-            onChange={(e) => setImage(e.target.files[0])}
-            type="file"
-            id="image"
-            hidden
-            required
+            type="checkbox"
+            id="update-mode"
+            checked={isUpdateMode}
+            onChange={(e) => setIsUpdateMode(e.target.checked)}
           />
+          <label htmlFor="update-mode">Update Existing Product</label>
         </div>
+
+        {isUpdateMode && (
+          <div className="add-product-id flex-col">
+            <p>Product ID</p>
+            <input
+              type="text"
+              value={productId}
+              onChange={(e) => setProductId(e.target.value)}
+              placeholder="Enter Product ID"
+              required
+            />
+          </div>
+        )}
 
         <div className="add-product-name flex-col">
           <p>Product Name</p>
           <input
-            onChange={onChangeHandler}
-            value={data.name}
             type="text"
             name="name"
-            placeholder="Name"
+            value={data.name}
+            onChange={onChangeHandler}
+            placeholder="Enter product name"
             required
           />
         </div>
 
         <div className="add-product-discription flex-col">
-          <p>Product Description</p>
-          <textarea
-            onChange={onChangeHandler}
-            value={data.category}
+          <p>Product Category</p>
+          <select
             name="category"
-            rows="6"
-            placeholder="Category (example: Pizza, Burger, etc.)"
+            value={data.category}
+            onChange={onChangeHandler}
             required
-          ></textarea>
+          >
+            <option value="">Select Category</option>
+            {categories.map((cat, index) => (
+              <option key={index} value={cat}>{cat}</option>
+            ))}
+          </select>
         </div>
 
         <div className="add-category-price">
           <div className="add-category flex-col">
             <p>Supplier ID</p>
             <input
-              onChange={onChangeHandler}
-              value={data.supplier_id}
-              type="text"
+              type="number"
               name="supplier_id"
+              value={data.supplier_id}
+              onChange={onChangeHandler}
               placeholder="Supplier ID"
               required
             />
@@ -136,19 +159,21 @@ const Add = () => {
           <div className="add-price flex-col">
             <p>Product Price</p>
             <input
-              onChange={onChangeHandler}
-              value={data.price}
               type="number"
               name="price"
+              value={data.price}
+              onChange={onChangeHandler}
               placeholder="Price"
               required
             />
           </div>
         </div>
 
-        <button type="submit" className="add-btn">
-          Add Product
-        </button>
+        <div className="button-group">
+          <button type="submit" className={isUpdateMode ? "update-btn" : "add-btn"}>
+            {isUpdateMode ? "✔️ Update Product" : "➕ Add Product"}
+          </button>
+        </div>
       </form>
     </div>
   );

@@ -3,15 +3,14 @@ import axios from "axios";
 
 export const StoreContext = createContext(null);
 
-const StoreContextProvider = (props) => {
+const StoreContextProvider = ({ children }) => {
   const [food_list, setFoodList] = useState([]);
   const [cartItems, setCartItems] = useState({});
 
-  // Fetch product list from backend
   useEffect(() => {
     const fetchFoodList = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/products"); // update if different URL
+        const response = await axios.get("http://localhost:3000/api/products");
         setFoodList(response.data);
       } catch (error) {
         console.error("Error fetching food list:", error);
@@ -20,7 +19,6 @@ const StoreContextProvider = (props) => {
     fetchFoodList();
   }, []);
 
-  // Add to cart
   const addToCart = (itemId) => {
     setCartItems((prev) => ({
       ...prev,
@@ -28,49 +26,44 @@ const StoreContextProvider = (props) => {
     }));
   };
 
-  // Remove from cart
-  const removeFromCart = (itemId, removeAll = false) => {
+  const removeFromCart = (itemId) => {
     setCartItems((prev) => {
       const updated = { ...prev };
-      if (removeAll || updated[itemId] <= 1) {
-        delete updated[itemId];
-      } else {
+      if (updated[itemId] > 1) {
         updated[itemId] -= 1;
+      } else {
+        delete updated[itemId];
       }
       return updated;
     });
   };
 
-  // Get total cart amount
   const getTotalCartAmount = () => {
     let total = 0;
-    for (const id in cartItems) {
-      const product = food_list.find((item) => item.ID === parseInt(id));
-      if (product) {
-        total += product.PRICE * cartItems[id];
+    for (const item of food_list) {
+      if (cartItems[item.ID]) {
+        total += item.PRICE * cartItems[item.ID];
       }
     }
     return total;
   };
 
-  // Get total quantity
   const getTotalQuantity = () => {
-    return Object.values(cartItems).reduce((acc, val) => acc + val, 0);
-  };
-
-  const contextValue = {
-    food_list,
-    cartItems,
-    setCartItems,
-    addToCart,
-    removeFromCart,
-    getTotalCartAmount,
-    getTotalQuantity,
+    return Object.values(cartItems).reduce((a, b) => a + b, 0);
   };
 
   return (
-    <StoreContext.Provider value={contextValue}>
-      {props.children}
+    <StoreContext.Provider
+      value={{
+        food_list,
+        cartItems,
+        addToCart,
+        removeFromCart,
+        getTotalCartAmount,
+        getTotalQuantity,
+      }}
+    >
+      {children}
     </StoreContext.Provider>
   );
 };

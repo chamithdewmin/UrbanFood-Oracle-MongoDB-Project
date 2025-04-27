@@ -84,3 +84,35 @@
 .counter-btn:hover {
   background-color: #1976d2;
 }
+
+
+.food-item-counter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.counter-btn {
+  background-color: #3498db; /* blue color */
+  color: white;
+  border: none;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  margin: 0 5px;
+  transition: 0.3s ease;
+}
+
+.counter-btn:hover {
+  background-color: #2980b9; /* darker blue on hover */
+}
+
+.food-item-counter p {
+  font-size: 18px;
+  margin: 0 10px;
+  min-width: 20px;
+  text-align: center;
+}

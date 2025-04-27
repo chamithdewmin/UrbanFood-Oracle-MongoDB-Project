@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import "./FoodItem.css";
+import "./FoodItem.css"; // you can style it better
 import { StoreContext } from "../../context/StoreContext";
 
 const FoodItem = ({ id, name, price, description, image }) => {
@@ -18,19 +18,13 @@ const FoodItem = ({ id, name, price, description, image }) => {
         <p className="food-item-desc">{description}</p>
         <p className="food-item-price">${price.toFixed(2)}</p>
 
-        <div className="food-item-action">
-          {!cartItems[id] ? (
-            <button className="add-to-cart-btn" onClick={() => addToCart(id)}>
-              Add to Cart
-            </button>
-          ) : (
-            <div className="food-item-counter">
-              <button className="counter-btn" onClick={() => removeFromCart(id)}>-</button>
-              <p>{cartItems[id]}</p>
-              <button className="counter-btn" onClick={() => addToCart(id)}>+</button>
-            </div>
-          )}
+        {/* Always show counter */}
+        <div className="food-item-counter">
+          <button className="counter-btn" onClick={() => removeFromCart(id)}>-</button>
+          <p>{cartItems[id] || 0}</p>
+          <button className="counter-btn" onClick={() => addToCart(id)}>+</button>
         </div>
+
       </div>
     </div>
   );

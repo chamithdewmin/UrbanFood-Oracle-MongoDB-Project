@@ -1,134 +1,195 @@
-.add{
-    width: 70%;
-    margin-left: max(5vw,25px);
-    margin-top: 50px;
-    color: #6d6d6d;
-    font-size: 16px;
+.add {
+  width: 70%;
+  margin-left: max(5vw, 25px);
+  margin-top: 50px;
+  color: #6d6d6d;
+  font-size: 16px;
 }
 
-.add form{
-    gap: 20px;
+.add form {
+  gap: 20px;
 }
 
-.flex-col{
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-.add-img-upload{
-    width: 120px;
-    border-radius: 5px;
+.flex-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.add-product-name, .add-product-discription{
-    width: max(40%,20px);
+.add-product-name,
+.add-product-discription {
+  width: max(40%, 200px);
 }
 
-.add-product-name input, .add-product-discription textarea{
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #a9a9a9;
-    border-radius: 5px;
+.add-product-name input,
+.add-product-discription input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #a9a9a9;
+  border-radius: 5px;
+  font-size: 16px;
 }
 
-.add-category-price{
-    display: flex;
-    gap: 30px;
-    border-radius: 5px;
+.add-category-price {
+  display: flex;
+  gap: 30px;
 }
 
-.add-category-price select, .add-category-price input{
-    max-width: 120px;
-    padding: 10px;
-    border-radius: 5px;
+.add-category-price input {
+  max-width: 120px;
+  padding: 10px;
+  border: 1px solid #a9a9a9;
+  border-radius: 5px;
+  font-size: 16px;
 }
 
-.add-btn{
-    max-width: 120px;
-    padding: 10px;
-    border-radius: 5px;
-    background-color: #ffb400;
-    color: #ffffff;
-    cursor: pointer;
+.button-group {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
 }
 
+.add-btn,
+.update-btn {
+  max-width: 150px;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #ffb400;
+  color: #ffffff;
+  cursor: pointer;
+  border: none;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.add-btn:hover {
+  background-color: #e0a300;
+}
+
+.update-btn {
+  background-color: #007bff;
+}
+
+.update-btn:hover {
+  background-color: #0065d1;
+}
+
+.add-product-id input {
+  max-width: 200px;
+  padding: 10px;
+  border: 1px solid #a9a9a9;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+/* Alert System */
 .alert-box {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    width: 300px;
-    padding: 15px;
-    border-radius: 8px;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    z-index: 1000;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  }
-  
-  .alert-box.success {
-    background: #ffb400;
-  }
-  
-  .alert-box.error {
-    background: #f44336;
-  }
-  
-  .alert-content {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-  }
-  
-  .alert-content img {
-    width: 24px;
-    height: 24px;
-  }
-  
-  .progress-bar {
-    height: 3px;
-    background: rgba(255,255,255,0.5);
-    width: 100%;
-    border-radius: 2px;
-    animation: progress 3s linear forwards;
-  }
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 300px;
+  padding: 15px;
+  border-radius: 8px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1000;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
 
-  .slide-in {
-    animation: slideIn 0.5s ease-out forwards;
+.alert-box.success {
+  background: #28a745;
+}
+
+.alert-box.error {
+  background: #f44336;
+}
+
+.alert-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.progress-bar {
+  height: 3px;
+  background: rgba(255, 255, 255, 0.5);
+  width: 100%;
+  border-radius: 2px;
+  animation: progress 3s linear forwards;
+}
+
+.slide-in {
+  animation: slideIn 0.5s ease-out forwards;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
   }
-  
-  @keyframes slideIn {
-    from {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
+  to {
+    transform: translateX(0);
+    opacity: 1;
   }
-  
-  @keyframes progress {
-    from {
-      width: 100%;
-    }
-    to {
-      width: 0%;
-    }
+}
+
+@keyframes progress {
+  from {
+    width: 100%;
   }
-  
-  .alert-box.slide-out {
-    animation: slideOut 0.5s ease-in forwards;
+  to {
+    width: 0%;
   }
-  
-  @keyframes slideOut {
-    from {
-      transform: translateX(0);
-      opacity: 1;
-    }
-    to {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-  }
+}
+.checkbox-update {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.checkbox-update input {
+  width: 20px;
+  height: 20px;
+}
+/* Add this inside your add.css file */
+
+/* For the select dropdown */
+.add-product-discription select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #a9a9a9;
+  border-radius: 5px;
+  font-size: 16px;
+  background-color: #fff;
+  appearance: none; /* Remove default arrow */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+/* Optional: Add a little dropdown arrow manually (nice styling) */
+.add-product-discription {
+  position: relative;
+}
+
+.add-product-discription::after {
+  content: "▼";
+  font-size: 12px;
+  position: absolute;
+  top: 60%;
+  right: 20px;
+  pointer-events: none;
+  transform: translateY(-50%);
+  color: #999;
+}
+
+/* To make all inputs and dropdown look same height */
+.add-product-name input,
+.add-product-discription textarea,
+.add-product-discription select,
+.add-category-price input {
+  height: 40px;
+  box-sizing: border-box;
+}

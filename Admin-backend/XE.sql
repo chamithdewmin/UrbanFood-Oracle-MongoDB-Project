@@ -20,8 +20,6 @@ CREATE TABLE suppliers (
     location VARCHAR2(255) NOT NULL
 );
 
--- Products Table
-CREATE TABLE products (
     id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name VARCHAR2(255) NOT NULL,
     category VARCHAR2(100),
@@ -29,7 +27,6 @@ CREATE TABLE products (
     supplier_id NUMBER,
     FOREIGN KEY (supplier_id) REFERENCES suppliers(id) ON DELETE CASCADE
 );
-
 -- Orders Table
 CREATE TABLE orders (
     id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

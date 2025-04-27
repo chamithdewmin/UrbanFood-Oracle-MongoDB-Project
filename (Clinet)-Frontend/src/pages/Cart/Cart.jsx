@@ -4,8 +4,6 @@ import { StoreContext } from "../../context/StoreContext";
 import { useNavigate } from "react-router-dom";
 import { assets } from "../../assets/assets";
 
-export const deliveryFee = 2;
-
 const Cart = () => {
   const {
     cartItems,
@@ -15,8 +13,10 @@ const Cart = () => {
     getTotalQuantity,
   } = useContext(StoreContext);
 
-  const totalQuantity = getTotalQuantity();
   const navigate = useNavigate();
+  const subtotal = getTotalCartAmount();
+  const deliveryFee = subtotal > 3000 ? 0 : 2;
+  const total = subtotal + deliveryFee;
 
   return (
     <div className="cart">
@@ -31,15 +31,15 @@ const Cart = () => {
         </div>
         <br />
         <hr />
-        {totalQuantity === 0 ? (
+        {Object.keys(cartItems).length === 0 ? (
           <p className="NoItems">No Items in cart</p>
         ) : (
-          food_list.map((item, index) => {
+          food_list.map((item) => {
             if (cartItems[item.ID] > 0) {
               return (
                 <React.Fragment key={item.ID}>
                   <div className="cart-items-title cart-items-item">
-                    <img src={item.IMAGE} alt="food" />
+                    <img src={item.IMAGE} alt={item.NAME} />
                     <p>{item.NAME}</p>
                     <p>${item.PRICE.toFixed(2)}</p>
                     <p>{cartItems[item.ID]}</p>
@@ -51,7 +51,7 @@ const Cart = () => {
                       <img src={assets.remove_icon_cross} alt="remove" />
                     </p>
                   </div>
-                  <hr key={`hr-${item.ID}-${index}`} />
+                  <hr />
                 </React.Fragment>
               );
             }
@@ -60,48 +60,32 @@ const Cart = () => {
         )}
       </div>
 
-      {/* BOTTOM PART */}
+      {/* Bottom Section */}
       <div className="cart-bottom">
         <div className="cart-total">
           <h2>Cart Total</h2>
           <div>
             <div className="cart-total-details">
               <p>Subtotal</p>
-              <p>${getTotalCartAmount().toFixed(2)}</p>
+              <p>${subtotal.toFixed(2)}</p>
             </div>
             <hr />
             <div className="cart-total-details">
               <p>Delivery Fee</p>
-              <p>${getTotalCartAmount() === 0 ? 0 : deliveryFee.toFixed(2)}</p>
+              <p>{deliveryFee === 0 ? "Free" : `$${deliveryFee.toFixed(2)}`}</p>
             </div>
             <hr />
             <div className="cart-total-details">
               <b>Total</b>
-              <b>
-                $
-                {getTotalCartAmount() === 0
-                  ? 0
-                  : (getTotalCartAmount() + deliveryFee).toFixed(2)}
-              </b>
+              <b>${total.toFixed(2)}</b>
             </div>
           </div>
           <button
-            disabled={getTotalCartAmount() === 0}
+            disabled={subtotal === 0}
             onClick={() => navigate("/order")}
           >
             PROCEED TO CHECKOUT
           </button>
-        </div>
-
-        {/* PROMO CODE AREA */}
-        <div className="cart-promocode">
-          <div>
-            <p>If you have a promo code, enter it here</p>
-            <div className="cart-promocode-input">
-              <input type="text" placeholder="Promo Code" />
-              <button>Submit</button>
-            </div>
-          </div>
         </div>
       </div>
     </div>
