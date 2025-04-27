@@ -1,12 +1,9 @@
-// db/dbConfig.js
-
 const oracledb = require("oracledb");
 
-// ✅ Database Connection Configuration
 const dbConfig = {
-  user: "HR",      // <-- Replace with your username
-  password: "admin123",  // <-- Replace with your password
-  connectString: "localhost/XE"   // <-- Change if needed
+  user: 'URBANFOOD',          // ✅ your created user
+  password: 'urban123',        // ✅ your user password
+  connectString: 'localhost:1521/XEPDB1' // ✅ connection string to database
 };
 
 async function getConnection() {
