@@ -8,10 +8,10 @@ const {
 
 const router = express.Router();
 
-// Customer Routes
-router.get('/customers', getCustomers);            // GET /api/customers
-router.post('/customers', createCustomer);         // POST /api/customers
-router.put('/customers/:id', updateCustomer);      // PUT /api/customers/:id
-router.delete('/customers/:id', deleteCustomer);   // DELETE /api/customers/:id
+// Correct Routes
+router.get('/', getCustomers);          // GET /api/customers
+router.post('/', createCustomer);       // POST /api/customers
+router.put('/:id', updateCustomer);     // PUT /api/customers/:id
+router.delete('/:id', deleteCustomer);  // DELETE /api/customers/:id
 
 module.exports = router;

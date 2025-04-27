@@ -5,6 +5,7 @@
   font-family: "Segoe UI", sans-serif;
 }
 
+/* Header */
 .list-header {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -21,11 +22,12 @@
   text-align: center;
 }
 
+/* List Items */
 .list-item {
-  margin-bottom: 1rem;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
   overflow: hidden;
 }
 
@@ -42,18 +44,20 @@
   padding: 0.5rem;
 }
 
-.actions {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: center;
-}
-
+/* Product Image */
 .product-image {
   width: 60px;
   height: 60px;
   object-fit: cover;
   border-radius: 4px;
   margin: 0 auto;
+}
+
+/* Actions Buttons */
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
 }
 
 .button {
@@ -63,12 +67,13 @@
   border-radius: 6px;
   cursor: pointer;
   font-weight: 500;
-  transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  transition: all 0.3s ease;
 }
 
+/* Button Styles */
 .edit-btn {
   background: linear-gradient(135deg, #4ffe89 0%, #00fe44 100%);
   color: white;
@@ -98,6 +103,7 @@
   color: white;
 }
 
+/* Edit Mode Panel */
 .edit-panel {
   padding: 1.5rem;
   background: #f8f9fa;
@@ -108,17 +114,7 @@
   animation: slideDown 0.3s ease-out;
 }
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
+/* Edit Section */
 .edit-section {
   display: flex;
   flex-direction: column;
@@ -147,6 +143,7 @@
   box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.2);
 }
 
+/* Image Upload */
 .image-upload {
   display: flex;
   align-items: center;
@@ -161,6 +158,7 @@
   border: 2px solid #dee2e6;
 }
 
+/* Edit Actions */
 .edit-actions {
   grid-column: 1 / -1;
   display: flex;
@@ -169,8 +167,20 @@
   padding-top: 1rem;
 }
 
+/* Animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes shake {
-  0% {
+  0%, 100% {
     transform: translateX(0);
   }
   25% {
@@ -182,11 +192,24 @@
   75% {
     transform: translateX(3px);
   }
-  100% {
-    transform: translateX(0);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
   }
 }
 
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Button Hover & Active */
 .button:hover {
   filter: brightness(1.05);
   transform: translateY(-1px);
@@ -198,22 +221,12 @@
   filter: brightness(0.95);
 }
 
+/* Special Delete Animation */
 .delete-btn.deleting {
   animation: pulse 1.5s infinite;
 }
 
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
+/* Loading Spinner */
 .loading::after {
   content: "";
   width: 16px;
@@ -222,10 +235,4 @@
   border-top-color: white;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
 }

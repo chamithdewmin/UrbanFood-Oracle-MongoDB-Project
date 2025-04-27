@@ -5,7 +5,7 @@ import Sidebar from "./Components/Sidebar/Sidebar";
 import Add from "./Pages/Add/add";
 import Order from "./Pages/Order/order";
 import List from "./Pages/List/list";
-import Promocode from "./Pages/Promocode/promocode";
+import Promocode from "./Pages/suppliers/suppliers";
 import AuthForm from "./Components/AuthForm/AuthForm";
 import Dashboard from "./Pages/Dashboard/dashboard";
 import { useContext } from "react";

@@ -1,0 +1,46 @@
+.supplier-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin: 20px;
+  gap: 20px;
+}
+
+/* Left Side: Form */
+.form-container {
+  flex: 1;
+}
+
+/* Table Container */
+.stable-container {
+  width: 500px;        /* 📏 Set exact width */
+  height: auto;        /* ✨ Adjust height automatically */
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.1);
+
+  margin-top: 40px;    /* 📏 Move down */
+  margin-left: auto;   /* 📦 Center the table */
+  margin-right: auto;  /* 📦 Center the table */
+}
+
+
+/* Supplier Table inside stable-container */
+.stable-container table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.stable-container th,
+.stable-container td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+.stable-container th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+}
