@@ -1,7 +1,7 @@
 const { initializeDB } = require('../db/dbConnection');
 const oracledb = require('oracledb');
 
-// Add a new supplier
+// Add a new supplier using PROCEDURE
 async function createSupplier(req, res) {
   const { name, location } = req.body;
 
@@ -12,19 +12,21 @@ async function createSupplier(req, res) {
   try {
     const connection = await initializeDB();
     await connection.execute(
-      `INSERT INTO suppliers (name, location) VALUES (:name, :location)`,
+      `BEGIN
+         insert_supplier(:name, :location);
+       END;`,
       { name, location },
       { autoCommit: true }
     );
     await connection.close();
-    return res.status(201).json({ message: "Supplier added successfully." });
+    return res.status(201).json({ message: "Supplier added successfully via procedure." });
   } catch (error) {
     console.error('Error adding supplier:', error);
     return res.status(500).json({ message: "Error adding supplier.", error: error.message });
   }
 }
 
-// Get all suppliers
+// Get all suppliers (no procedure needed)
 async function getSuppliers(req, res) {
   try {
     const connection = await initializeDB();
@@ -41,7 +43,7 @@ async function getSuppliers(req, res) {
   }
 }
 
-// Update a supplier
+// Update supplier using PROCEDURE
 async function updateSupplier(req, res) {
   const { id } = req.params;
   const { name, location } = req.body;
@@ -64,19 +66,21 @@ async function updateSupplier(req, res) {
     }
 
     await connection.execute(
-      `UPDATE suppliers SET name = :name, location = :location WHERE id = :id`,
-      { name, location, id: parseInt(id) },
+      `BEGIN
+         update_supplier(:id, :name, :location);
+       END;`,
+      { id: parseInt(id), name, location },
       { autoCommit: true }
     );
     await connection.close();
-    return res.json({ message: "Supplier updated successfully." });
+    return res.json({ message: "Supplier updated successfully via procedure." });
   } catch (error) {
     console.error('Error updating supplier:', error);
     return res.status(500).json({ message: "Error updating supplier.", error: error.message });
   }
 }
 
-// Delete a supplier
+// Delete supplier using PROCEDURE
 async function deleteSupplier(req, res) {
   const { id } = req.params;
 
@@ -94,12 +98,14 @@ async function deleteSupplier(req, res) {
     }
 
     await connection.execute(
-      `DELETE FROM suppliers WHERE id = :id`,
+      `BEGIN
+         delete_supplier(:id);
+       END;`,
       { id: parseInt(id) },
       { autoCommit: true }
     );
     await connection.close();
-    return res.json({ message: "Supplier deleted successfully." });
+    return res.json({ message: "Supplier deleted successfully via procedure." });
   } catch (error) {
     console.error('Error deleting supplier:', error);
     return res.status(500).json({ message: "Error deleting supplier.", error: error.message });

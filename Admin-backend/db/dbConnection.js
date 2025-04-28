@@ -1,11 +1,10 @@
 const oracledb = require('oracledb');
 
-// Oracle DB connection configuration
+// Oracle DB connection configuration (DEFAULT user, not SYS)
 const dbConfig = {
-  user: 'SYS',
-  password: 'admin123',
-  connectString: 'localhost:1521/XE',
-  privilege: oracledb.SYSDBA
+  user: 'System',          
+  password: 'admin123',       
+  connectString: 'localhost:1521/XE' 
 };
 
 // Connect to the Oracle DB

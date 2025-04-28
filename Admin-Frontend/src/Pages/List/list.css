@@ -236,3 +236,29 @@
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
+
+/* Header */
+.list-header {
+  display: grid;
+  grid-template-columns: 1fr 2fr 2fr 1fr 1fr 1fr; /* 6 columns */
+  gap: 1rem;
+  padding: 1rem;
+  background: #ffb400;
+  color: white;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.header-item {
+  font-weight: bold;
+  text-align: center;
+}
+
+/* List Items */
+.item-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr 2fr 1fr 1fr 1fr; /* 6 columns */
+  gap: 1rem;
+  padding: 1rem;
+  align-items: center;
+}

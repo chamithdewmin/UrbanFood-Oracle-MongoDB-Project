@@ -8,48 +8,56 @@ async function createOrderWithCustomer(req, res) {
   try {
     connection = await initializeDB();
 
-    // Insert Customer
+    // Insert Customer using Procedure and get Customer ID
     const customerResult = await connection.execute(
-      `INSERT INTO customers (name, email, phone, address)
-       VALUES (:name, :email, :phone, :address)
-       RETURNING id INTO :id`,
+      `BEGIN
+         insert_customer(:name, :email, :phone, :address);
+         SELECT id INTO :id FROM customers WHERE email = :email;
+       END;`,
       {
         name: customer.name,
         email: customer.email,
         phone: customer.phone,
         address: customer.address,
         id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
-      }
+      },
+      { autoCommit: false }
     );
-    const customerId = customerResult.outBinds.id[0];
+    const customerId = customerResult.outBinds.id;
 
-    // Insert Order
+    // Insert Order using Procedure and get Order ID
     const orderResult = await connection.execute(
-      `INSERT INTO orders (customer_id, total_amount, status)
-       VALUES (:customer_id, :total_amount, 'Pending')
-       RETURNING id INTO :id`,
+      `BEGIN
+         insert_order(:customer_id, :total_amount, :status);
+         SELECT id INTO :id FROM orders WHERE customer_id = :customer_id AND ROWNUM = 1 ORDER BY id DESC;
+       END;`,
       {
         customer_id: customerId,
         total_amount,
+        status: 'Pending',
         id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
-      }
+      },
+      { autoCommit: false }
     );
-    const orderId = orderResult.outBinds.id[0];
+    const orderId = orderResult.outBinds.id;
 
-    // Insert Order Items
+    // Insert each Order Item using Procedure
     for (const item of items) {
       await connection.execute(
-        `INSERT INTO order_items (order_id, product_id, quantity, price)
-         VALUES (:order_id, :product_id, :quantity, :price)`,
+        `BEGIN
+           insert_order_item(:order_id, :product_id, :quantity, :price);
+         END;`,
         {
           order_id: orderId,
           product_id: item.product_id,
           quantity: item.quantity,
           price: item.price * item.quantity
-        }
+        },
+        { autoCommit: false }
       );
     }
 
+    // Commit all changes
     await connection.commit();
     res.status(201).json({ message: "Order created successfully", orderId: orderId });
 

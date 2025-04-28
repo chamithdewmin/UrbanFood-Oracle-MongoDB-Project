@@ -18,7 +18,7 @@ async function getProducts(req, res) {
   }
 }
 
-// Create a new product
+// Create a new product using PROCEDURE
 async function createProduct(req, res) {
   const { name, category, price, supplier_id } = req.body;
 
@@ -29,8 +29,9 @@ async function createProduct(req, res) {
   try {
     const connection = await initializeDB();
     await connection.execute(
-      `INSERT INTO products (name, category, price, supplier_id)
-       VALUES (:name, :category, :price, :supplier_id)`,
+      `BEGIN
+         insert_product(:name, :category, :price, :supplier_id);
+       END;`,
       {
         name,
         category: category || null,
@@ -40,14 +41,14 @@ async function createProduct(req, res) {
       { autoCommit: true }
     );
     await connection.close();
-    return res.status(201).json({ message: 'Product created successfully.' });
+    return res.status(201).json({ message: 'Product created successfully via procedure.' });
   } catch (error) {
     console.error('Error creating product:', error);
     return res.status(500).json({ message: error.message || 'Error creating product.' });
   }
 }
 
-// Update a product
+// Update a product using PROCEDURE
 async function updateProduct(req, res) {
   const { id } = req.params;
   const { name, category, price, supplier_id } = req.body;
@@ -58,6 +59,7 @@ async function updateProduct(req, res) {
 
   try {
     const connection = await initializeDB();
+
     const result = await connection.execute(
       `SELECT id FROM products WHERE id = :id`,
       { id: parseInt(id) }
@@ -69,9 +71,9 @@ async function updateProduct(req, res) {
     }
 
     await connection.execute(
-      `UPDATE products
-       SET name = :name, category = :category, price = :price, supplier_id = :supplier_id
-       WHERE id = :id`,
+      `BEGIN
+         update_product(:id, :name, :category, :price, :supplier_id);
+       END;`,
       {
         id: parseInt(id),
         name,
@@ -83,19 +85,20 @@ async function updateProduct(req, res) {
     );
 
     await connection.close();
-    return res.json({ message: 'Product updated successfully.' });
+    return res.json({ message: 'Product updated successfully via procedure.' });
   } catch (error) {
     console.error('Error updating product:', error);
     return res.status(500).json({ message: error.message || 'Error updating product.' });
   }
 }
 
-// Delete a product
+// Delete a product using PROCEDURE
 async function deleteProduct(req, res) {
   const { id } = req.params;
 
   try {
     const connection = await initializeDB();
+
     const result = await connection.execute(
       `SELECT id FROM products WHERE id = :id`,
       { id: parseInt(id) }
@@ -107,12 +110,14 @@ async function deleteProduct(req, res) {
     }
 
     await connection.execute(
-      `DELETE FROM products WHERE id = :id`,
+      `BEGIN
+         delete_product(:id);
+       END;`,
       { id: parseInt(id) },
       { autoCommit: true }
     );
     await connection.close();
-    return res.json({ message: 'Product deleted successfully.' });
+    return res.json({ message: 'Product deleted successfully via procedure.' });
   } catch (error) {
     console.error('Error deleting product:', error);
     return res.status(500).json({ message: error.message || 'Error deleting product.' });

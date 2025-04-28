@@ -1,4 +1,5 @@
 const { initializeDB } = require('../db/dbConnection');
+const oracledb = require('oracledb');
 
 // Get all customers
 async function getCustomers(req, res) {
@@ -8,7 +9,7 @@ async function getCustomers(req, res) {
     const result = await connection.execute(
       'SELECT * FROM customers',
       [],
-      { outFormat: require('oracledb').OUT_FORMAT_OBJECT }
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     res.status(200).json(result.rows);
   } catch (error) {
@@ -19,7 +20,7 @@ async function getCustomers(req, res) {
   }
 }
 
-// Create a new customer
+// Create a new customer using the PROCEDURE
 async function createCustomer(req, res) {
   const { name, email, phone, address } = req.body;
 
@@ -30,24 +31,17 @@ async function createCustomer(req, res) {
   let connection;
   try {
     connection = await initializeDB();
-    const result = await connection.execute(
-      `INSERT INTO customers (name, email, phone, address) 
-       VALUES (:name, :email, :phone, :address)
-       RETURNING id INTO :id`,
-      {
-        name,
-        email,
-        phone,
-        address,
-        id: { dir: require('oracledb').BIND_OUT, type: require('oracledb').NUMBER }
-      },
+
+    // Call the procedure insert_customer
+    await connection.execute(
+      `BEGIN
+         insert_customer(:name, :email, :phone, :address);
+       END;`,
+      { name, email, phone, address },
       { autoCommit: true }
     );
 
-    res.status(201).json({
-      message: 'Customer created successfully',
-      customerId: result.outBinds.id[0]
-    });
+    res.status(201).json({ message: 'Customer created successfully' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error creating customer', error });
@@ -56,7 +50,7 @@ async function createCustomer(req, res) {
   }
 }
 
-// Update a customer
+// Update a customer (still manual UPDATE because no procedure is defined for updating)
 async function updateCustomer(req, res) {
   const { id } = req.params;
   const { name, email, phone, address } = req.body;
@@ -78,7 +72,7 @@ async function updateCustomer(req, res) {
       return res.status(404).json({ message: 'Customer not found' });
     }
 
-    const result = await connection.execute(
+    await connection.execute(
       `UPDATE customers 
        SET name = :name, email = :email, phone = :phone, address = :address
        WHERE id = :id`,
@@ -95,7 +89,7 @@ async function updateCustomer(req, res) {
   }
 }
 
-// Delete a customer
+// Delete a customer (still manual DELETE because no procedure is defined for deleting)
 async function deleteCustomer(req, res) {
   const { id } = req.params;
 
