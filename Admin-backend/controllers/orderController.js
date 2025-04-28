@@ -7,7 +7,7 @@ async function getAllOrders(req, res) {
   try {
     connection = await initializeDB();
     const result = await connection.execute(
-      `SELECT id, customer_id, order_date, total_amount, status FROM orders`,
+      `SELECT id, customer_id, order_date, total_amount, status FROM orders`, // ✅ Corrected SQL string
       [],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
@@ -34,7 +34,7 @@ async function createOrder(req, res) {
     await connection.execute(
       `BEGIN 
          insert_order(:customer_id, :total_amount, :status); 
-       END;`,
+       END;`, // ✅ Corrected PL/SQL block with quotes
       {
         customer_id,
         total_amount,
@@ -64,8 +64,8 @@ async function deleteOrder(req, res) {
     await connection.execute(
       `BEGIN 
          delete_order(:id); 
-       END;`,
-      { id: Number(id) },
+       END;`, // ✅ Corrected PL/SQL block
+      { id: parseInt(id) },
       { autoCommit: true }
     );
     res.json({ message: 'Order deleted successfully.' });

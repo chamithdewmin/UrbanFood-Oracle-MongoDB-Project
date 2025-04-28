@@ -48,7 +48,7 @@
 
 /* Confirm Order & Pay Button */
 .confirm-button {
-  background: linear-gradient(135deg, #1e90ff 0%, #00bfff 100%);
+  background: #ffb400;
   color: white;
   padding: 0.8rem 2rem;
   font-size: 1.1rem;
@@ -65,7 +65,7 @@
 }
 
 .confirm-button:hover {
-  background: linear-gradient(135deg, #00bfff 0%, #1e90ff 100%);
+  background:#ffb400;
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(30, 144, 255, 0.4);
 }

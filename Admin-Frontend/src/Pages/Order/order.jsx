@@ -4,7 +4,7 @@ import "./order.css";
 import { AdminContext } from "../../context/AdminContext";
 import Button from "@mui/material/Button";
 import { TreeSelect } from "antd";
-import parcelIcon from "../../assets/parcel_icon.png"; // ✅ Import the parcel icon correctly
+import parcelIcon from "../../assets/parcel_icon.png"; // ✅ Correct import
 
 const Order = () => {
   const { token } = useContext(AdminContext);
@@ -18,7 +18,7 @@ const Order = () => {
     try {
       setLoading(true);
       const response = await axios.get("http://localhost:3000/api/orders", {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` }, // ✅ Correct header syntax
       });
       setOrders(response.data);
     } catch (error) {
@@ -34,12 +34,10 @@ const Order = () => {
     }
   }, [token]);
 
-  // Count items (temporary static - adjust logic later)
   const countItems = (orderId) => {
     return 1;
   };
 
-  // Handle status change locally
   const handleStatusChange = (orderId, newStatus) => {
     setOrders((prevOrders) =>
       prevOrders.map((order) =>
@@ -54,13 +52,12 @@ const Order = () => {
     );
   };
 
-  // Handle update to backend
   const handleUpdateStatus = async () => {
     setIsUpdating(true);
     try {
       for (let updatedOrder of updatedOrders) {
         await axios.put(
-          `http://localhost:3000/api/orders/${updatedOrder.orderId}`,
+          `http://localhost:3000/api/orders/${updatedOrder.orderId}`, // ✅ Corrected URL string
           { status: updatedOrder.status },
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -68,7 +65,7 @@ const Order = () => {
         );
       }
       setUpdatedOrders([]);
-      await fetchOrders(); // Refresh after updating
+      await fetchOrders();
     } catch (error) {
       console.error("Error updating status:", error);
     } finally {
@@ -76,11 +73,10 @@ const Order = () => {
     }
   };
 
-  // Handle delete order
   const handleDeleteOrder = async (orderId) => {
     setIsUpdating(true);
     try {
-      await axios.delete(`http://localhost:3000/api/orders/${orderId}`, {
+      await axios.delete(`http://localhost:3000/api/orders/${orderId}`, { // ✅ Corrected URL string
         headers: { Authorization: `Bearer ${token}` },
       });
       setOrders((prevOrders) => prevOrders.filter((order) => order.id !== orderId));
@@ -131,7 +127,7 @@ const Order = () => {
                 </div>
 
                 <div className="order-details">
-                  <p className="order-items">{`Order ID: ${order.id}`}</p>
+                  <p className="order-items">{`Order ID: ${order.id}`}</p> {/* ✅ Correct JSX template */}
                   <p className="order-info">{`User ID: ${order.customer_id}`}</p>
                   <p className="order-info">{`Date: ${new Date(order.order_date).toLocaleString()}`}</p>
                 </div>

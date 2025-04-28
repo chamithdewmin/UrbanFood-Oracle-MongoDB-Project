@@ -52,7 +52,7 @@
 
 .add-to-cart-btn {
   padding: 8px 12px;
-  background-color: #4caf50;
+  background-color: #ffb400;
   color: white;
   border: none;
   border-radius: 20px;
@@ -62,7 +62,7 @@
 }
 
 .add-to-cart-btn:hover {
-  background-color: #45a049;
+  background-color: #ffb400;
 }
 
 .food-item-counter {
@@ -73,7 +73,7 @@
 
 .counter-btn {
   padding: 5px 10px;
-  background-color: #2196f3;
+  background-color: #ffb400;
   color: white;
   border: none;
   border-radius: 50%;
@@ -82,7 +82,7 @@
 }
 
 .counter-btn:hover {
-  background-color: #1976d2;
+  background-color:  #725000;
 }
 
 
@@ -94,7 +94,7 @@
 }
 
 .counter-btn {
-  background-color: #3498db; /* blue color */
+  background-color: #ffb400;
   color: white;
   border: none;
   width: 35px;
@@ -107,7 +107,7 @@
 }
 
 .counter-btn:hover {
-  background-color: #2980b9; /* darker blue on hover */
+  background-color: #725000;
 }
 
 .food-item-counter p {

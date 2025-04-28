@@ -37,12 +37,12 @@
 .feedback-input input:focus,
 .feedback-input textarea:focus {
   outline: none;
-  border-color: #4caf50;
+  border-color:#ffb400;
   box-shadow: 0 0 5px rgba(76, 175, 80, 0.4);
 }
 
 .feedback-submit {
-  background-color: #4caf50;
+  background-color: #ffb400;
   color: white;
   padding: 12px 20px;
   border: none;
@@ -54,7 +54,7 @@
 }
 
 .feedback-submit:hover {
-  background-color: #388e3c;
+  background-color: #e6a200;
 }
 
 /* === FEEDBACK CARDS SMALL RECTANGLES === */
