@@ -112,3 +112,31 @@
     transform: rotate(360deg);
   }
 }
+.order-details p {
+  margin: 5px 0;
+  font-size: 15px;
+}
+
+.order-details b {
+  display: inline-block;
+  width: 120px;
+}
+
+.order-details span {
+  color: #555;
+}
+
+.order-summary p {
+  font-size: 15px;
+}
+
+.order-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px;
+  border: 1px solid #ddd;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  background-color: #fafafa;
+}

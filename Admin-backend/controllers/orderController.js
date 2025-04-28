@@ -1,13 +1,13 @@
 const { initializeDB } = require('../db/dbConnection');
 const oracledb = require('oracledb');
 
-// Fetch all orders
+// Get all orders
 async function getAllOrders(req, res) {
   let connection;
   try {
     connection = await initializeDB();
     const result = await connection.execute(
-      `SELECT id, customer_id, order_date, total_amount, status FROM orders`, // ✅ Corrected SQL string
+      `SELECT id, customer_id, order_date, total_amount, status FROM orders`,
       [],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
@@ -20,26 +20,18 @@ async function getAllOrders(req, res) {
   }
 }
 
-// Create a new order using PROCEDURE
+// Create order (you already have)
 async function createOrder(req, res) {
   const { customer_id, total_amount, status } = req.body;
-
   if (!customer_id || !total_amount) {
     return res.status(400).json({ message: "Customer ID and total amount are required" });
   }
-
   let connection;
   try {
     connection = await initializeDB();
     await connection.execute(
-      `BEGIN 
-         insert_order(:customer_id, :total_amount, :status); 
-       END;`, // ✅ Corrected PL/SQL block with quotes
-      {
-        customer_id,
-        total_amount,
-        status: status || null,
-      },
+      `BEGIN insert_order(:customer_id, :total_amount, :status); END;`,
+      { customer_id, total_amount, status: status || null },
       { autoCommit: true }
     );
     res.status(201).json({ message: 'Order created successfully.' });
@@ -51,20 +43,41 @@ async function createOrder(req, res) {
   }
 }
 
-// Delete an order using PROCEDURE
+// Update order status
+async function updateOrder(req, res) {
+  const { id } = req.params;
+  const { status } = req.body;
+  if (!id || !status) {
+    return res.status(400).json({ message: "Order ID and new status are required" });
+  }
+  let connection;
+  try {
+    connection = await initializeDB();
+    await connection.execute(
+      `BEGIN update_order(:id, NULL, NULL, :status); END;`,
+      { id: parseInt(id), status },
+      { autoCommit: true }
+    );
+    res.json({ message: 'Order updated successfully.' });
+  } catch (error) {
+    console.error('Error updating order:', error);
+    res.status(500).json({ message: 'Failed to update order', error });
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+// Delete order
 async function deleteOrder(req, res) {
   const { id } = req.params;
   if (!id) {
     return res.status(400).json({ message: "Order ID is required" });
   }
-
   let connection;
   try {
     connection = await initializeDB();
     await connection.execute(
-      `BEGIN 
-         delete_order(:id); 
-       END;`, // ✅ Corrected PL/SQL block
+      `BEGIN delete_order(:id); END;`,
       { id: parseInt(id) },
       { autoCommit: true }
     );
@@ -77,4 +90,4 @@ async function deleteOrder(req, res) {
   }
 }
 
-module.exports = { getAllOrders, createOrder, deleteOrder };
+module.exports = { getAllOrders, createOrder, updateOrder, deleteOrder };

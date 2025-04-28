@@ -1,14 +1,11 @@
 const express = require('express');
-const { getAllOrders, createOrder, deleteOrder } = require('../controllers/orderController');
+const { getAllOrders, createOrder, updateOrder, deleteOrder } = require('../controllers/orderController');
 const router = express.Router();
 
-// Get all orders
-router.get('/', getAllOrders);
-
-// Create new order (if needed)
-router.post('/', createOrder);
-
-// Delete specific order
-router.delete('/:id', deleteOrder);
+// Route mappings
+router.get('/', getAllOrders);        // GET all orders
+router.post('/', createOrder);        // (optional) POST create new order
+router.put('/:id', updateOrder);       // PUT update order status
+router.delete('/:id', deleteOrder);    // DELETE an order
 
 module.exports = router;

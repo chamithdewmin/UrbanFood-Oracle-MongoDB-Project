@@ -4,116 +4,84 @@ import "./order.css";
 import { AdminContext } from "../../context/AdminContext";
 import Button from "@mui/material/Button";
 import { TreeSelect } from "antd";
-import parcelIcon from "../../assets/parcel_icon.png"; // ✅ Correct import
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import parcelIcon from "../../assets/parcel_icon.png";
 
 const Order = () => {
   const { token } = useContext(AdminContext);
   const [orders, setOrders] = useState([]);
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [updatedOrders, setUpdatedOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   // Fetch all orders
   const fetchOrders = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
       const response = await axios.get("http://localhost:3000/api/orders", {
-        headers: { Authorization: `Bearer ${token}` }, // ✅ Correct header syntax
+        headers: { Authorization: `Bearer ${token}` },
       });
       setOrders(response.data);
     } catch (error) {
       console.error("Error fetching orders:", error);
+      setError("Failed to fetch orders");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (token) {
-      fetchOrders();
-    }
+    if (token) fetchOrders();
   }, [token]);
 
-  const countItems = (orderId) => {
-    return 1;
-  };
-
-  const handleStatusChange = (orderId, newStatus) => {
-    setOrders((prevOrders) =>
-      prevOrders.map((order) =>
-        order.id === orderId ? { ...order, status: newStatus } : order
-      )
-    );
-    setUpdatedOrders((prevUpdatedOrders) =>
-      prevUpdatedOrders.filter((order) => order.orderId !== orderId).concat({
-        orderId,
-        status: newStatus,
-      })
-    );
-  };
-
-  const handleUpdateStatus = async () => {
-    setIsUpdating(true);
+  // Update order status
+  const handleStatusChange = async (orderId, newStatus) => {
     try {
-      for (let updatedOrder of updatedOrders) {
-        await axios.put(
-          `http://localhost:3000/api/orders/${updatedOrder.orderId}`, // ✅ Corrected URL string
-          { status: updatedOrder.status },
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-      }
-      setUpdatedOrders([]);
+      await axios.put(
+        `http://localhost:3000/api/orders/${orderId}`,
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success("Order status updated!");
       await fetchOrders();
     } catch (error) {
       console.error("Error updating status:", error);
-    } finally {
-      setIsUpdating(false);
+      toast.error("Failed to update status!");
     }
   };
 
+  // Delete order
   const handleDeleteOrder = async (orderId) => {
-    setIsUpdating(true);
     try {
-      await axios.delete(`http://localhost:3000/api/orders/${orderId}`, { // ✅ Corrected URL string
+      await axios.delete(`http://localhost:3000/api/orders/${orderId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setOrders((prevOrders) => prevOrders.filter((order) => order.id !== orderId));
+      toast.success("Order deleted successfully!");
+      await fetchOrders();
     } catch (error) {
       console.error("Error deleting order:", error);
-    } finally {
-      setIsUpdating(false);
+      toast.error("Failed to delete order!");
     }
   };
 
   return (
     <div className="order">
-      {isUpdating && (
+      <ToastContainer position="top-right" autoClose={3000} />
+
+      {loading && (
         <div className="loading-overlay">
           <div className="loading-spinner"></div>
         </div>
       )}
 
       <div className="order-header-container">
-        <Button
-          onClick={fetchOrders}
-          disabled={loading}
-          variant="outlined"
-        >
-          {loading ? "Loading…" : "Fetch Orders"}
-        </Button>
-
-        <Button
-          onClick={handleUpdateStatus}
-          variant="contained"
-          color="primary"
-          disabled={isUpdating || updatedOrders.length === 0}
-          style={{ marginLeft: "10px" }}
-        >
-          Update Status
+        <Button onClick={fetchOrders} variant="outlined">
+          {loading ? "Loading…" : "Refresh Orders"}
         </Button>
       </div>
+
+      {error && <div className="error-message">{error}</div>}
 
       <div className="order-list">
         {orders.length === 0 ? (
@@ -123,18 +91,17 @@ const Order = () => {
             <div key={order.id} className="order-item">
               <div className="order-header">
                 <div className="order-image">
-                  <img src={parcelIcon} alt="Package" /> {/* ✅ Correct usage */}
+                  <img src={parcelIcon} alt="Package" />
                 </div>
 
                 <div className="order-details">
-                  <p className="order-items">{`Order ID: ${order.id}`}</p> {/* ✅ Correct JSX template */}
-                  <p className="order-info">{`User ID: ${order.customer_id}`}</p>
-                  <p className="order-info">{`Date: ${new Date(order.order_date).toLocaleString()}`}</p>
+                  <p><b>Order ID:</b> <span>{order.id}</span></p>
+                  <p><b>Customer ID:</b> <span>{order.customer_id}</span></p>
+                  <p><b>Order Date:</b> <span>{new Date(order.order_date).toLocaleString()}</span></p>
                 </div>
 
                 <div className="order-summary">
-                  <p>Items: {countItems(order.id)}</p>
-                  <p className="order-price">${order.total_amount}</p>
+                  <p><b>Total:</b> <span>${order.total_amount}</span></p>
                 </div>
 
                 <div className="order-status">
@@ -142,12 +109,13 @@ const Order = () => {
                     value={order.status}
                     onChange={(newStatus) => handleStatusChange(order.id, newStatus)}
                     treeData={[
-                      { title: "Delivered", value: "Delivered" },
                       { title: "Pending", value: "Pending" },
+                      { title: "Delivered", value: "Delivered" },
                       { title: "Cancel", value: "Cancel" },
                     ]}
                     className="status-dropdown"
-                    disabled={isUpdating}
+                    style={{ width: 150 }}
+                    dropdownStyle={{ zIndex: 9999 }}
                   />
                 </div>
 
@@ -156,7 +124,6 @@ const Order = () => {
                     variant="outlined"
                     color="error"
                     onClick={() => handleDeleteOrder(order.id)}
-                    disabled={isUpdating}
                   >
                     Delete
                   </Button>

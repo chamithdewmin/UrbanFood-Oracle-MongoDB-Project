@@ -400,3 +400,22 @@ BEGIN
 END;
 /
 
+
+
+-- Show all Customers
+SELECT * FROM customers;
+
+-- Show all Suppliers
+SELECT * FROM suppliers;
+
+-- Show all Products
+SELECT * FROM products;
+
+-- Show all Orders
+SELECT * FROM orders;
+
+-- Show all Order Items
+SELECT * FROM order_items;
+
+-- Show all Payments
+SELECT * FROM payments;
